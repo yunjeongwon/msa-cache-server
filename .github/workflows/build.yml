@@ -1,0 +1,25 @@
+name: cache-server integration
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ec2 SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: DB_HOST, DB_USERNAME
+          script_stop: true
+          script: |
+            cd /home/ubuntu/msa-cache-server
+            docker compose pull
+            docker compose up -d
